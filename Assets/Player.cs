@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Player : MonoBehaviour
@@ -32,14 +33,15 @@ public class Player : MonoBehaviour
         Debug.Log($"RB Pos: {rb.position}, Velocity: {rb.velocity}");
         LookAround();
         Move();
+        Attack();
     }
     void OnCollisionStay(Collision collision)
-{
-    if (collision.gameObject.CompareTag("Ground"))
     {
-     
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+
+        }
     }
-}
     private void LookAround()
     {
         Vector2 mouseDelta = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y")) * mouseSensitivity;
@@ -54,12 +56,17 @@ public class Player : MonoBehaviour
         // ▶ 몸체는 좌우 회전 (Player 자체를 회전시킴)
         transform.rotation = Quaternion.Euler(0f, yRotation, 0f);
     }
-
+    private void Attack()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            anime.SetTrigger("Punch");
+        }
+    }
     private void Move()
     {
         Vector2 moveInput = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
         bool isMoving = moveInput.magnitude > 0f;
-
         anime.SetBool("Walk", isMoving);
 
         // 기본 이동 속도 설정
@@ -67,13 +74,24 @@ public class Player : MonoBehaviour
 
         // 달리기 조건: 이동 중 + Shift
         bool isRunning = isMoving && Input.GetKey(KeyCode.LeftShift);
-
         if (isRunning)
         {
             currentSpeed = 20f;
         }
-
         anime.SetBool("Run", isRunning);
+
+        bool isAcceleration = Input.GetKey(KeyCode.Space);
+        if (isAcceleration)
+        {
+            anime.speed = 5f;
+            transform.position += transform.forward * 5f;
+            anime.SetBool("Accel", isMoving);
+        }
+        else
+        {
+            anime.speed = 1f;
+            anime.SetBool("Accel", false);
+        }
 
         if (isMoving)
         {
@@ -86,9 +104,9 @@ public class Player : MonoBehaviour
 
             //현재 Y는 유지하고, XZ만 MovePosition으로 이동
             Vector3 targetPos = rb.position + moveDir.normalized * currentSpeed * Time.deltaTime;
-            targetPos.y = rb.position.y; 
+            targetPos.y = rb.position.y;
 
             rb.MovePosition(targetPos);
         }
     }
-} 
+}
