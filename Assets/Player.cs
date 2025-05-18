@@ -1,67 +1,94 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.AI;
 
 public class Player : MonoBehaviour
 {
-    // 플레이어 몸체와 카메라에 대한 참조
-    [SerializeField]
-    private Transform PlayerBody; // 플레이어 오브젝트 (캐릭터 모델)
-    [SerializeField]
-    private Transform CameraDT; // 카메라의 부모 객체 (카메라의 회전 및 위치 제어)
+    [SerializeField] private Transform PlayerBody;  // 캐릭터 외형 (자식 오브젝트)
+    [SerializeField] private Transform CameraDT;    // 카메라 회전 기준점 (카메라의 부모)
 
-    private Vector3 cameraOffset; // 카메라와 플레이어 간의 오프셋 (카메라의 위치를 결정)
+    [SerializeField] private float mouseSensitivity = 3f;
+    [SerializeField] private float moveSpeed = 5f;
+
+    private float xRotation = 0f; // 상하 회전 누적값
+    private float yRotation = 0f; // 좌우 회전 누적값
+    private Animator anime;
+    Rigidbody rb; //transform.position을 직접 조작하니까 물리를 무시하고 이동함
 
     void Start()
     {
+        rb = GetComponent<Rigidbody>();
+        anime = GetComponent<Animator>();
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+        anime.applyRootMotion = false; //
     }
 
     void Update()
     {
+    }
+    void FixedUpdate()
+    {
+        Debug.Log($"RB Pos: {rb.position}, Velocity: {rb.velocity}");
         LookAround();
         Move();
     }
-    // 플레이어의 이동 처리
-    private void Move()
+    void OnCollisionStay(Collision collision)
+{
+    if (collision.gameObject.CompareTag("Ground"))
     {
-        // 이동 방향을 카메라의 회전과 일치하도록 설정 (수평 방향으로만 이동)
-        Debug.DrawRay(CameraDT.position, new Vector3(CameraDT.forward.x, 0f, CameraDT.forward.z).normalized, Color.red);
-        Vector2 moveInput = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
-        bool isMove = moveInput.magnitude != 0; // 입력값이 있는지 확인 (이동이 있는지)
-
-        // 이동 입력이 있으면
-        if (isMove)
-        {
-            // 카메라가 바라보는 방향을 기준으로 이동하도록 설정
-            // 수평 방향은 카메라의 오른쪽(직각 방향)으로 설정
-            Vector3 looKForwad = new Vector3(CameraDT.forward.x, 0f, CameraDT.forward.z).normalized;
-            Vector3 LookRight = new Vector3(CameraDT.right.x, 0f, CameraDT.right.z).normalized;
-            // 이동 방향 계산
-            Vector3 MoveDir = looKForwad * moveInput.y + LookRight * moveInput.x;
-            PlayerBody.forward = looKForwad;
-            //계산된 이동 방향에 맞춰 플레이어의 위치 변경
-            transform.position += MoveDir * Time.deltaTime * 5f;
-        }
-    }
-
-    // 카메라 회전 처리
-    private void LookAround()
-    {
-        Vector2 mouseDelta = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
-        Vector3 camAngle = CameraDT.rotation.eulerAngles;
-        // 카메라의 수직 회전 범위를 제한 (마우스 Y축 이동)
-        float x = camAngle.x - mouseDelta.y;
-        if (x < 180f)
-        {
-            x = Mathf.Clamp(x, -1f, 70f);  // 수직 회전 범위 제한
-        }
-        else
-        {
-            x = Mathf.Clamp(x, 340f, 361f); // 수직 회전 범위 제한
-        }
-
-        // 카메라의 수평 회전도 마우스 X축 이동에 따라 변하도록 설정
-        CameraDT.rotation = Quaternion.Euler(x, camAngle.y + mouseDelta.x, camAngle.z);
+     
     }
 }
+    private void LookAround()
+    {
+        Vector2 mouseDelta = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y")) * mouseSensitivity;
+
+        yRotation += mouseDelta.x;
+        xRotation -= mouseDelta.y;
+        xRotation = Mathf.Clamp(xRotation, -25f, 70f); // 위아래 회전 제한
+
+        // ▶ 카메라는 상하 회전만
+        CameraDT.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+
+        // ▶ 몸체는 좌우 회전 (Player 자체를 회전시킴)
+        transform.rotation = Quaternion.Euler(0f, yRotation, 0f);
+    }
+
+    private void Move()
+    {
+        Vector2 moveInput = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+        bool isMoving = moveInput.magnitude > 0f;
+
+        anime.SetBool("Walk", isMoving);
+
+        // 기본 이동 속도 설정
+        float currentSpeed = moveSpeed;
+
+        // 달리기 조건: 이동 중 + Shift
+        bool isRunning = isMoving && Input.GetKey(KeyCode.LeftShift);
+
+        if (isRunning)
+        {
+            currentSpeed = 20f;
+        }
+
+        anime.SetBool("Run", isRunning);
+
+        if (isMoving)
+        {
+            Vector3 forward = transform.forward;
+            Vector3 right = transform.right;
+
+            // 수평 방향만 유지
+            Vector3 moveDir = forward * moveInput.y + right * moveInput.x;
+            moveDir = Vector3.ProjectOnPlane(moveDir, Vector3.up);
+
+            //현재 Y는 유지하고, XZ만 MovePosition으로 이동
+            Vector3 targetPos = rb.position + moveDir.normalized * currentSpeed * Time.deltaTime;
+            targetPos.y = rb.position.y; 
+
+            rb.MovePosition(targetPos);
+        }
+    }
+} 
