@@ -30,10 +30,9 @@ public class Player : MonoBehaviour
     }
     void FixedUpdate()
     {
-        Debug.Log($"RB Pos: {rb.position}, Velocity: {rb.velocity}");
+        //Debug.Log($"RB Pos: {rb.position}, Velocity: {rb.velocity}"); //다른 힘이 적용받는지 체크용
         LookAround();
         Move();
-        Attack();
     }
     void OnCollisionStay(Collision collision)
     {
@@ -56,13 +55,6 @@ public class Player : MonoBehaviour
         // ▶ 몸체는 좌우 회전 (Player 자체를 회전시킴)
         transform.rotation = Quaternion.Euler(0f, yRotation, 0f);
     }
-    private void Attack()
-    {
-        if (Input.GetMouseButtonDown(0))
-        {
-            anime.SetTrigger("Punch");
-        }
-    }
     private void Move()
     {
         Vector2 moveInput = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
@@ -79,7 +71,7 @@ public class Player : MonoBehaviour
             currentSpeed = 20f;
         }
         anime.SetBool("Run", isRunning);
-
+        //불셋 애니는 애니메이터 변수이름 int는 자체 애니메이션 이름
         bool isAcceleration = Input.GetKey(KeyCode.Space);
         if (isAcceleration)
         {
