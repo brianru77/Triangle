@@ -15,7 +15,14 @@ public class Player : MonoBehaviour
     private float yRotation = 0f; // 좌우 회전 누적값
     private Animator anime;
     Rigidbody rb; //transform.position을 직접 조작하니까 물리를 무시하고 이동함
-
+    private bool Flying;
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            Flying = false;
+        }
+    }
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -33,12 +40,27 @@ public class Player : MonoBehaviour
         //Debug.Log($"RB Pos: {rb.position}, Velocity: {rb.velocity}"); //다른 힘이 적용받는지 체크용
         LookAround();
         Move();
+        Fly();
+    }
+    void Fly()
+    {
+        if (Input.GetKey(KeyCode.Q))
+        {
+            Flying = true;
+            rb.AddForce(Vector3.up * 30.0f, ForceMode.Acceleration); //상승값
+            Vector3 dir2 = new Vector3(0, 0, 0);
+        }
+        if (Flying)
+        {
+            anime.enabled = false;
+        }
     }
     void OnCollisionStay(Collision collision)
     {
         if (collision.gameObject.CompareTag("Ground"))
         {
-
+            Flying = false;
+            anime.enabled = true;
         }
     }
     private void LookAround()

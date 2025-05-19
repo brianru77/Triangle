@@ -12,14 +12,8 @@ public class Attack : MonoBehaviour
 
     void Start()
     {
-  Debug.Log("✅ Attack.cs - Start 실행됨");
-    anime = GetComponent<Animator>();
-    if (anime == null)
-        Debug.LogError("❌ Animator 없음");
-    else
-        Debug.Log("✅ Animator 연결됨");
+        anime = GetComponent<Animator>();
     }
-
     void Update()
     {
         if (Input.GetMouseButtonDown(0))
@@ -33,7 +27,6 @@ public class Attack : MonoBehaviour
             ResetCombo();
         }
     }
-
     void HandleComboInput()
     {
         if (!canReceiveInput) return;
@@ -44,19 +37,19 @@ public class Attack : MonoBehaviour
         if (comboStep == 1)
         {
             Debug.Log("1타");
-            anime.Play("Boxing");
-        }
-        else if (comboStep == 2)
-        {
-            Debug.Log("2타");
-            anime.Play("Elbow Punch");
-        }
-        else if (comboStep == 3)
-        {
-            Debug.Log("3타");
             anime.Play("Martelo 2");
-            comboStep = 0; // 마지막 콤보까지 끝나면 초기화
         }
+        // else if (comboStep == 2)
+        // {
+        //     Debug.Log("2타");
+        //     anime.Play("Boxing");
+        // }
+        // else if (comboStep == 3)
+        // {
+        //     Debug.Log("3타");
+        //     anime.Play("Martelo 2");
+        //     comboStep = 0; // 마지막 콤보까지 끝나면 초기화
+        // }
 
         canReceiveInput = false;
     }
