@@ -11,8 +11,6 @@
 >>  MosqCoin으로 아이템 구매 가능
 
 + ## 게임 방법
-[조작법 ⌨](https://github.com/RuDaz7/2D_Game-The-Mosquito-/issues/7#issue-1525499815)  
-[승리 조건👊](https://github.com/RuDaz7/2D_Game-The-Mosquito-/issues/9#issue-1560824799)  
   
 + ## 개발 단계 업데이트
 > <img src="https://github.com/user-attachments/assets/aeaa5763-23ff-40fe-b300-c02fa34b769f" width="70%" height="70%">
