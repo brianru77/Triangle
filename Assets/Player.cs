@@ -16,6 +16,8 @@ public class Player : MonoBehaviour
     private Animator anime;
     Rigidbody rb; //transform.position을 직접 조작하니까 물리를 무시하고 이동함
     private bool Flying;
+    public bool isMoving;
+
     void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("Ground"))
@@ -29,7 +31,7 @@ public class Player : MonoBehaviour
         anime = GetComponent<Animator>();
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-        anime.applyRootMotion = false; //
+        anime.applyRootMotion = false;
     }
 
     void Update()
@@ -55,12 +57,22 @@ public class Player : MonoBehaviour
             anime.enabled = false;
         }
     }
-    void OnCollisionStay(Collision collision)
+    void OnCollisionStay(Collision collision) //땅에 닿았을 때
     {
         if (collision.gameObject.CompareTag("Ground"))
         {
             Flying = false;
             anime.enabled = true;
+            isMoving = true;
+            Debug.Log("땅에 닿음^^");
+        }
+    }
+    void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            isMoving = false;
+            Debug.Log("땅에서 떨어짐!");
         }
     }
     private void LookAround()
@@ -80,9 +92,8 @@ public class Player : MonoBehaviour
     private void Move()
     {
         Vector2 moveInput = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
-        bool isMoving = moveInput.magnitude > 0f;
+        bool isMoving = moveInput.magnitude > 0.1f;
         anime.SetBool("Walk", isMoving);
-
         // 기본 이동 속도 설정
         float currentSpeed = moveSpeed;
 
@@ -93,8 +104,9 @@ public class Player : MonoBehaviour
             currentSpeed = 20f;
         }
         anime.SetBool("Run", isRunning);
+
         //불셋 애니는 애니메이터 변수이름 int는 자체 애니메이션 이름
-        bool isAcceleration = Input.GetKey(KeyCode.Space);
+        bool isAcceleration = Input.GetKey(KeyCode.F);
         if (isAcceleration)
         {
             anime.speed = 5f;
