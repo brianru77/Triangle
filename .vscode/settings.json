@@ -51,5 +51,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "Triangle.sln"
+    "dotnet.defaultSolution": "The Mosquito 3D_ver.sln"
 }

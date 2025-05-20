@@ -34,11 +34,11 @@ public class Player : MonoBehaviour
 
     void Update()
     {
+        LookAround();
     }
     void FixedUpdate()
     {
         //Debug.Log($"RB Pos: {rb.position}, Velocity: {rb.velocity}"); //다른 힘이 적용받는지 체크용
-        LookAround();
         Move();
         Fly();
     }
@@ -98,7 +98,7 @@ public class Player : MonoBehaviour
         if (isAcceleration)
         {
             anime.speed = 5f;
-            transform.position += transform.forward * 5f;
+            transform.position += transform.forward * 3f;
             anime.SetBool("Accel", isMoving);
         }
         else
