@@ -15,7 +15,7 @@
 + ## 개발 단계 업데이트
 > <img src="https://github.com/user-attachments/assets/aeaa5763-23ff-40fe-b300-c02fa34b769f" width="80%" height="80%">
 > <img src="https://github.com/user-attachments/assets/bf85b75c-fcd3-4e88-a50a-de6baa1ba0ce" width="80%" height="80%">
-+ ### 아직 애니메이션 없음
++ ### 기능 테스트 중 애니메이션 없음
 > <img src="https://github.com/user-attachments/assets/ee148719-7d60-4c08-bfd9-5c249a984fa7" width="80%" height="80%">
 
 + ## 게임 플레이 영상 
