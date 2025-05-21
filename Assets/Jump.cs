@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 public class Jump : MonoBehaviour
 {
-    [SerializeField] private float jumpForce = 20f;
-    [SerializeField] private float doubleJumpForce = 10f;
-    [SerializeField] private float TripleJumpForce = 5f;
+    [SerializeField] private float jumpForce = 10f;
+    [SerializeField] private float doubleJumpForce = 5f;
     public int currentJumpCount = 0;
     private Rigidbody rb;
     private Animator anime;
