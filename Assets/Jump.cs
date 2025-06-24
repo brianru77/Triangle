@@ -14,6 +14,7 @@ public class Jump : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         anime = GetComponent<Animator>();
+        anime.SetInteger("Jump", 0);
     }
 
     void Update()
@@ -24,28 +25,24 @@ public class Jump : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space) && currentJumpCount == 0)
         {
-            rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z); // 기존 y축 속도 초기화
+            currentJumpCount = 1; // 먼저 바꾸고
+            anime.SetInteger("Jump", currentJumpCount); // 그리고 Animator에 알려줌
+            rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
             rb.AddForce(Vector3.up * jumpForce, ForceMode.VelocityChange);
-            anime.SetInteger("Jump", currentJumpCount);
-            Debug.Log("1단 점프 실행됨");
-            Debug.Log(currentJumpCount);
-            currentJumpCount = 1;
+            Debug.Log("1단 점프");
         }
         if (Input.GetKeyUp(KeyCode.Space) && currentJumpCount == 1)
         {
             Double_Jump = true;
         }
-        if (Double_Jump)
+        if (Double_Jump && Input.GetKeyDown(KeyCode.Space))
         {
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z); // 기존 y축 속도 초기화
-                rb.AddForce(Vector3.up * doubleJumpForce, ForceMode.VelocityChange);
-                anime.SetInteger("Jump", currentJumpCount);
-                Debug.Log("더블점프 실행됨");
-                Debug.Log(currentJumpCount);
-                currentJumpCount = 2;
-            }
+            currentJumpCount = 2;
+            anime.SetInteger("Jump", currentJumpCount);
+            rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+            rb.AddForce(Vector3.up * doubleJumpForce, ForceMode.VelocityChange);
+            Double_Jump = false; // 안전하게 꺼줌
+            Debug.Log("2단 점프");
         }
         if (currentJumpCount >= 2)
         {
@@ -58,6 +55,8 @@ public class Jump : MonoBehaviour
         if (collision.gameObject.CompareTag("Ground"))
         {
             currentJumpCount = 0;
+            anime.SetInteger("Jump", 0); // 초기화
+             Debug.Log("땅에 닿음");
         }
     }
 }

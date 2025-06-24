@@ -57,24 +57,6 @@ public class Player : MonoBehaviour
             anime.enabled = false;
         }
     }
-    void OnCollisionStay(Collision collision) //땅에 닿았을 때
-    {
-        if (collision.gameObject.CompareTag("Ground"))
-        {
-            Flying = false;
-            anime.enabled = true;
-            isMoving = true;
-            Debug.Log("땅에 닿음^^");
-        }
-    }
-    void OnCollisionExit(Collision collision)
-    {
-        if (collision.gameObject.CompareTag("Ground"))
-        {
-            isMoving = false;
-            Debug.Log("땅에서 떨어짐!");
-        }
-    }
     private void LookAround()
     {
         Vector2 mouseDelta = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y")) * mouseSensitivity;
@@ -83,56 +65,61 @@ public class Player : MonoBehaviour
         xRotation -= mouseDelta.y;
         xRotation = Mathf.Clamp(xRotation, -25f, 70f); // 위아래 회전 제한
 
-        // ▶ 카메라는 상하 회전만
+        // 카메라는 상하 회전만
         CameraDT.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
 
-        // ▶ 몸체는 좌우 회전 (Player 자체를 회전시킴)
+        // 몸체는 좌우 회전 (Player 자체를 회전시킴)
         transform.rotation = Quaternion.Euler(0f, yRotation, 0f);
     }
-    private void Move()
+   private void Move()
+{
+    Vector2 moveInput = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+    bool isMoving = moveInput.magnitude > 0.1f;
+
+    float currentSpeed = moveSpeed;
+    bool isRunning = isMoving && Input.GetKey(KeyCode.LeftShift);
+    if (isRunning)
     {
-        Vector2 moveInput = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
-        bool isMoving = moveInput.magnitude > 0.1f;
-        anime.SetBool("Walk", isMoving);
-        // 기본 이동 속도 설정
-        float currentSpeed = moveSpeed;
+        currentSpeed = 20f;
+    }
 
-        // 달리기 조건: 이동 중 + Shift
-        bool isRunning = isMoving && Input.GetKey(KeyCode.LeftShift);
-        if (isRunning)
-        {
-            currentSpeed = 20f;
-        }
-        anime.SetBool("Run", isRunning);
+    // Blend Tree용 Speed 하나로 통일
+    float animSpeed = 0f;
+    if (isMoving)
+    {
+        animSpeed = isRunning ? 1f : 0.5f;
+    }
+    else
+    {
+        animSpeed = 0f;
+    }
+    anime.SetFloat("Speed", animSpeed);
 
-        //불셋 애니는 애니메이터 변수이름 int는 자체 애니메이션 이름
-        bool isAcceleration = Input.GetKey(KeyCode.F);
-        if (isAcceleration)
-        {
-            anime.speed = 5f;
-            transform.position += transform.forward * 3f;
-            anime.SetBool("Accel", isMoving);
-        }
-        else
-        {
-            anime.speed = 1f;
-            anime.SetBool("Accel", false);
-        }
+    bool isAcceleration = Input.GetKey(KeyCode.F);
+    if (isAcceleration)
+    {
+        anime.speed = 5f;
+        transform.position += transform.forward * 3f;
+        anime.SetBool("Accel", isMoving);
+    }
+    else
+    {
+        anime.speed = 1f;
+        anime.SetBool("Accel", false);
+    }
 
-        if (isMoving)
-        {
-            Vector3 forward = transform.forward;
-            Vector3 right = transform.right;
+    if (isMoving)
+    {
+        Vector3 forward = transform.forward;
+        Vector3 right = transform.right;
 
-            // 수평 방향만 유지
-            Vector3 moveDir = forward * moveInput.y + right * moveInput.x;
-            moveDir = Vector3.ProjectOnPlane(moveDir, Vector3.up);
+        Vector3 moveDir = forward * moveInput.y + right * moveInput.x;
+        moveDir = Vector3.ProjectOnPlane(moveDir, Vector3.up);
 
-            //현재 Y는 유지하고, XZ만 MovePosition으로 이동
-            Vector3 targetPos = rb.position + moveDir.normalized * currentSpeed * Time.deltaTime;
-            targetPos.y = rb.position.y;
+        Vector3 targetPos = rb.position + moveDir.normalized * currentSpeed * Time.deltaTime;
+        targetPos.y = rb.position.y;
 
-            rb.MovePosition(targetPos);
-        }
+        rb.MovePosition(targetPos);
+    }
     }
 }
