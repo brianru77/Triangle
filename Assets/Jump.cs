@@ -74,6 +74,15 @@ public class Jump : MonoBehaviour
             currentJumpCount = 0;
             anime.SetInteger("Jump", 0); // 초기화
             Debug.Log("땅에 닿음");
+            // 점프 상태 초기화
+            Double_Jump = false;
+            Triple_Jump = false;
+            
+            Vector3 flatVelocity = new Vector3(rb.velocity.x, 0, rb.velocity.z); // 리지드바디 잔상 제거
+            if (flatVelocity.magnitude > 0.1f)
+            {
+                rb.velocity = new Vector3(0, rb.velocity.y, 0); // XZ 이동속도 제거
+            }
         }
     }
 }
