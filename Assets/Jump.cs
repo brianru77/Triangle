@@ -4,14 +4,13 @@ using UnityEngine;
 public class Jump : MonoBehaviour
 {
     [SerializeField] private float jumpForce = 10f;
-    [SerializeField] private float doubleJumpForce = 5f;
+    [SerializeField] private float doubleJumpForce = 15f;
     public int currentJumpCount = 0;
     private Rigidbody rb;
     private Animator anime;
     public bool Double_Jump;
     public bool Triple_Jump;
     public float YVelocity;
-    public bool landing;
 
     void Start()
     {
@@ -23,7 +22,9 @@ public class Jump : MonoBehaviour
     void Update()
     {
         HandleJump();
-        anime.SetFloat("YVelocity", rb.velocity.y);
+        YVelocity = rb.velocity.y;
+        anime.SetFloat("YVelocity", rb.velocity.y); //프레임 낙하상태 감지
+        anime.SetInteger("JumpStage", currentJumpCount); //점프 카운트를 애니메이터 변수인 JumpStage로 전달
     }
     public void HandleJump()
     {
@@ -31,7 +32,7 @@ public class Jump : MonoBehaviour
         {
             currentJumpCount = 1; // 먼저 바꾸고
             anime.SetInteger("Jump", currentJumpCount); // 그리고 Animator에 알려줌
-            rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+            //rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
             rb.AddForce(Vector3.up * jumpForce, ForceMode.VelocityChange);
             Debug.Log("1단 점프");
         }
@@ -43,10 +44,11 @@ public class Jump : MonoBehaviour
         {
             currentJumpCount = 2;
             anime.SetInteger("Jump", currentJumpCount);
-            //rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
             rb.AddForce(Vector3.up * doubleJumpForce, ForceMode.VelocityChange);
             Double_Jump = false; // 안전하게 꺼줌
             Debug.Log("2단 점프");
+
+            rb.AddForce(transform.forward * 2f, ForceMode.VelocityChange);
         }
         if (Input.GetKeyUp(KeyCode.Space) && currentJumpCount == 2)
         {
@@ -60,7 +62,8 @@ public class Jump : MonoBehaviour
             Triple_Jump = false;
             Debug.Log("3단 착지");
 
-            rb.AddForce(Vector3.down * 20, ForceMode.VelocityChange);
+            rb.AddForce(Vector3.down * 30, ForceMode.VelocityChange);
+            rb.AddForce(transform.forward * 20f, ForceMode.VelocityChange);
         }
     }
 
