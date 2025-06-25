@@ -5,16 +5,15 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    [SerializeField] private Transform PlayerBody;  // 캐릭터 외형 (자식 오브젝트)
-    [SerializeField] private Transform CameraDT;    // 카메라 회전 기준점 (카메라의 부모)
-
+    [SerializeField] private Transform PlayerBody;  // 캐릭터 외형
+    [SerializeField] private Transform CameraDT;    // 카메라 회전 기준점
     [SerializeField] private float mouseSensitivity = 3f;
     [SerializeField] private float moveSpeed = 5f;
 
-    private float xRotation = 0f; // 상하 회전 누적값
-    private float yRotation = 0f; // 좌우 회전 누적값
+    private float xRotation = 0f;
+    private float yRotation = 0f;
     private Animator anime;
-    Rigidbody rb; //transform.position을 직접 조작하니까 물리를 무시하고 이동함
+    private Rigidbody rb;
     private bool Flying;
     public bool isMoving;
 
@@ -23,8 +22,10 @@ public class Player : MonoBehaviour
         if (collision.gameObject.CompareTag("Ground"))
         {
             Flying = false;
+            anime.enabled = true; // 땅에 닿으면 애니메이션 다시 활성화
         }
     }
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -38,88 +39,108 @@ public class Player : MonoBehaviour
     {
         LookAround();
     }
+
     void FixedUpdate()
     {
-        //Debug.Log($"RB Pos: {rb.position}, Velocity: {rb.velocity}"); //다른 힘이 적용받는지 체크용
         Move();
         Fly();
     }
+
     void Fly()
     {
         if (Input.GetKey(KeyCode.Q))
         {
             Flying = true;
-            rb.AddForce(Vector3.up * 30.0f, ForceMode.Acceleration); //상승값
-            Vector3 dir2 = new Vector3(0, 0, 0);
+            rb.AddForce(Vector3.up * 30.0f, ForceMode.Acceleration);
         }
-        if (Flying)
-        {
+
+        // 비행 중에는 애니메이션 중지, 땅에 닿으면 다시 활성화됨
+        if (!Flying && !anime.enabled)
+            anime.enabled = true;
+        else if (Flying)
             anime.enabled = false;
-        }
     }
+
     private void LookAround()
     {
         Vector2 mouseDelta = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y")) * mouseSensitivity;
 
         yRotation += mouseDelta.x;
         xRotation -= mouseDelta.y;
-        xRotation = Mathf.Clamp(xRotation, -25f, 70f); // 위아래 회전 제한
+        xRotation = Mathf.Clamp(xRotation, -25f, 70f);
 
-        // 카메라는 상하 회전만
         CameraDT.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
-
-        // 몸체는 좌우 회전 (Player 자체를 회전시킴)
         transform.rotation = Quaternion.Euler(0f, yRotation, 0f);
     }
-   private void Move()
-{
-    Vector2 moveInput = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
-    bool isMoving = moveInput.magnitude > 0.1f;
 
-    float currentSpeed = moveSpeed;
-    bool isRunning = isMoving && Input.GetKey(KeyCode.LeftShift);
-    if (isRunning)
+    private void Move()
     {
-        currentSpeed = 20f;
-    }
+        Vector2 moveInput = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+        this.isMoving = moveInput.magnitude > 0.1f;
 
-    // Blend Tree용 Speed 하나로 통일
-    float animSpeed = 0f;
-    if (isMoving)
-    {
-        animSpeed = isRunning ? 1f : 0.5f;
-    }
-    else
-    {
-        animSpeed = 0f;
-    }
-    anime.SetFloat("Speed", animSpeed);
+        float currentSpeed = moveSpeed;
+        bool isRunning = isMoving && Input.GetKey(KeyCode.LeftShift);
 
-    bool isAcceleration = Input.GetKey(KeyCode.F);
-    if (isAcceleration)
-    {
-        anime.speed = 5f;
-        transform.position += transform.forward * 3f;
-        anime.SetBool("Accel", isMoving);
-    }
-    else
-    {
-        anime.speed = 1f;
-        anime.SetBool("Accel", false);
-    }
+        // 달리기 시 속도 증가
+        if (isRunning)
+            currentSpeed = 20f;
 
-    if (isMoving)
-    {
-        Vector3 forward = transform.forward;
-        Vector3 right = transform.right;
+        // 이동 방향 보정
+        float moveX = moveInput.x;
+        float moveY = moveInput.y;
 
-        Vector3 moveDir = forward * moveInput.y + right * moveInput.x;
-        moveDir = Vector3.ProjectOnPlane(moveDir, Vector3.up);
+        // MoveY (앞/뒤) 보정
+        if (moveY > 0)
+            moveY = isRunning ? 1f : 0.5f;
+        else if (moveY < 0)
+            moveY = -0.5f;
+        else
+            moveY = 0f;
 
-        Vector3 targetPos = rb.position + moveDir.normalized * currentSpeed * Time.deltaTime;
-        targetPos.y = rb.position.y;
+        // MoveX (좌/우) 보정
+        if (Mathf.Abs(moveX) > 0)
+            moveX = Mathf.Sign(moveX) * 0.5f;
+        else
+            moveX = 0f;
 
-        rb.MovePosition(targetPos);
-    }
+        // 애니메이터 파라미터 적용
+        if (isMoving)
+        {
+            anime.SetFloat("MoveX", moveX);
+            anime.SetFloat("MoveY", moveY);
+        }
+        else
+        {
+            anime.SetFloat("MoveX", 0f);
+            anime.SetFloat("MoveY", 0f);
+        }
+
+        // 가속 이동 (F키)
+        bool isAcceleration = Input.GetKey(KeyCode.F);
+        if (isAcceleration)
+        {
+            anime.speed = 5f; // 애니메이션 빠르게 재생
+            rb.MovePosition(rb.position + transform.forward * 3f); // 순간 돌진
+            anime.SetBool("Accel", isMoving);
+        }
+        else
+        {
+            anime.speed = 1f;
+            anime.SetBool("Accel", false);
+        }
+
+        // 실제 위치 이동 처리
+        if (isMoving)
+        {
+            Vector3 forward = transform.forward;
+            Vector3 right = transform.right;
+            Vector3 moveDir = forward * moveInput.y + right * moveInput.x;
+            moveDir = Vector3.ProjectOnPlane(moveDir, Vector3.up); // 수평 이동만 적용
+
+            Vector3 targetPos = rb.position + moveDir.normalized * currentSpeed * Time.deltaTime;
+            targetPos.y = rb.position.y; // y 위치 고정
+
+            rb.MovePosition(targetPos); // 이동 적용
+        }
     }
 }
