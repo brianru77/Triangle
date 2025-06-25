@@ -62,7 +62,7 @@ public class Jump : MonoBehaviour
             Triple_Jump = false;
             Debug.Log("3단 착지");
 
-            rb.AddForce(Vector3.down * 30, ForceMode.VelocityChange);
+            rb.AddForce(Vector3.down * 35, ForceMode.VelocityChange);
             rb.AddForce(transform.forward * 20f, ForceMode.VelocityChange);
         }
     }
@@ -77,7 +77,7 @@ public class Jump : MonoBehaviour
             // 점프 상태 초기화
             Double_Jump = false;
             Triple_Jump = false;
-            
+
             Vector3 flatVelocity = new Vector3(rb.velocity.x, 0, rb.velocity.z); // 리지드바디 잔상 제거
             if (flatVelocity.magnitude > 0.1f)
             {

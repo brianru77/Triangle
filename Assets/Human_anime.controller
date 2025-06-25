@@ -280,7 +280,7 @@ AnimatorStateMachine:
     m_Position: {x: 40, y: 230, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 5771297219090273050}
-    m_Position: {x: 400, y: 430, z: 0}
+    m_Position: {x: 330, y: 440, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -7473155987383662949}
     m_Position: {x: 250, y: 130, z: 0}
@@ -466,7 +466,7 @@ AnimatorStateTransition:
   m_Mute: 0
   m_IsExit: 0
   serializedVersion: 3
-  m_TransitionDuration: 0.1
+  m_TransitionDuration: 0.7
   m_TransitionOffset: 0
   m_ExitTime: 0.8846154
   m_HasExitTime: 0
@@ -631,7 +631,7 @@ BlendTree:
   - serializedVersion: 2
     m_Motion: {fileID: 7400000, guid: a22aafb5c1f5ca246b12ed46f626b969, type: 2}
     m_Threshold: 2.5
-    m_Position: {x: 0.5, y: 0.5}
+    m_Position: {x: 0.5, y: 0}
     m_TimeScale: 1
     m_CycleOffset: 0
     m_DirectBlendParameter: BaseMove_Blend
