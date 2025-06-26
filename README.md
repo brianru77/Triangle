@@ -13,10 +13,12 @@
 + ## 게임 방법
   
 + ## 개발 단계 업데이트
-> <img src="https://github.com/user-attachments/assets/aeaa5763-23ff-40fe-b300-c02fa34b769f" width="80%" height="80%">
-> <img src="https://github.com/user-attachments/assets/bf85b75c-fcd3-4e88-a50a-de6baa1ba0ce" width="80%" height="80%">
-+ ### 기능 테스트 중 애니메이션 없음
-> <img src="https://github.com/user-attachments/assets/ee148719-7d60-4c08-bfd9-5c249a984fa7" width="80%" height="80%">
+> <img src="https://github.com/user-attachments/assets/aeaa5763-23ff-40fe-b300-c02fa34b769f" width="40%" height="60%">
+> <img src="https://github.com/user-attachments/assets/bf85b75c-fcd3-4e88-a50a-de6baa1ba0ce" width="40%" height="60%">
++ ### 기능 테스트
+> <img src="https://github.com/user-attachments/assets/ee148719-7d60-4c08-bfd9-5c249a984fa7" width="40%" height="60%">
+> <img src="https://github.com/user-attachments/assets/07eec0f0-9701-4ef2-ab50-4725e72b2a90" width="40%" height="60%">
+> <img src="https://github.com/user-attachments/assets/99652c98-084b-4e99-9573-62ed42700e1f" width="40%" height="60%">
 
 + ## 게임 플레이 영상 
 + ## 🏴‍보스 업데이트
