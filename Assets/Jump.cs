@@ -35,6 +35,7 @@ public class Jump : MonoBehaviour
             //rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
             rb.AddForce(Vector3.up * jumpForce, ForceMode.VelocityChange);
             Debug.Log("1단 점프");
+            rb.AddForce(transform.forward * 3f, ForceMode.VelocityChange);
         }
         if (Input.GetKeyUp(KeyCode.Space) && currentJumpCount == 1)
         {
@@ -47,8 +48,8 @@ public class Jump : MonoBehaviour
             rb.AddForce(Vector3.up * doubleJumpForce, ForceMode.VelocityChange);
             Double_Jump = false; // 안전하게 꺼줌
             Debug.Log("2단 점프");
-
-            rb.AddForce(transform.forward * 2f, ForceMode.VelocityChange);
+            rb.AddForce(transform.forward * 5f, ForceMode.VelocityChange);
+            rb.AddForce(Vector3.down * 3f, ForceMode.VelocityChange);
         }
         if (Input.GetKeyUp(KeyCode.Space) && currentJumpCount == 2)
         {
@@ -62,8 +63,9 @@ public class Jump : MonoBehaviour
             Triple_Jump = false;
             Debug.Log("3단 착지");
 
-            rb.AddForce(Vector3.down * 35, ForceMode.VelocityChange);
-            rb.AddForce(transform.forward * 20f, ForceMode.VelocityChange);
+            rb.AddForce(Vector3.down * 30, ForceMode.VelocityChange);
+            rb.AddForce(transform.forward * 25f, ForceMode.VelocityChange);
+            anime.speed = 1.2f;
         }
     }
 

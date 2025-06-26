@@ -115,20 +115,6 @@ public class Player : MonoBehaviour
             anime.SetFloat("MoveY", 0f);
         }
 
-        // 가속 이동 (F키)
-        bool isAcceleration = Input.GetKey(KeyCode.F);
-        if (isAcceleration)
-        {
-            anime.speed = 5f; // 애니메이션 빠르게 재생
-            rb.MovePosition(rb.position + transform.forward * 3f); // 순간 돌진
-            anime.SetBool("Accel", isMoving);
-        }
-        else
-        {
-            anime.speed = 1f;
-            anime.SetBool("Accel", false);
-        }
-
         // 실제 위치 이동 처리
         if (isMoving)
         {

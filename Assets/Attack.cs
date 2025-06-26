@@ -4,65 +4,113 @@ using UnityEngine;
 
 public class Attack : MonoBehaviour
 {
+    private Rigidbody rb;
     private Animator anime;
-    private int comboStep = 0;
-    private float lastClickTime = 0f;
-    private float comboDelay = 0.8f; // 콤보 입력 유효 시간
-    private bool canReceiveInput = true;
+
+    [Header("Dash Settings")]
+    [SerializeField] private float dashSpeed = 40f;           // 대시 속도
+    [SerializeField] private float maxDashDistance = 10f;      // 최대 대시 거리
+    [SerializeField] private float stopBeforeDistance = 0.3f; // 목표 지점에서 멈출 거리
+    [SerializeField] private LayerMask dashLayerMask;         // 바닥 레이어 (대시 타겟 지정용)
+
+    private bool isDashing = false;     // 대시 중인지 여부
+    private bool isAttacking = false;   // 공격 중인지 여부
 
     void Start()
     {
+        rb = GetComponent<Rigidbody>();
         anime = GetComponent<Animator>();
     }
+
     void Update()
     {
+        // 우클릭 대시
+        if (Input.GetMouseButtonDown(1) && !isDashing)
+        {
+            TryDashTowardMouse();
+        }
+
+        // 좌클릭 공격
         if (Input.GetMouseButtonDown(0))
         {
-            HandleComboInput();
+            isAttacking = true;
+            left_mouse_Attack();
         }
 
-        // 시간이 지나면 콤보 초기화
-        if (Time.time - lastClickTime > comboDelay)
+        // 좌클릭 떼면 공격 종료
+        if (Input.GetMouseButtonUp(0))
         {
-            ResetCombo();
+            isAttacking = false;
+            anime.SetBool("isAttacking", false); // 공격 상태 해제
         }
     }
-    void HandleComboInput()
+
+    // 공격 애니메이션 실행
+    void left_mouse_Attack()
     {
-        if (!canReceiveInput) return;
+        anime.SetBool("isAttacking", true);
+    }
 
-        lastClickTime = Time.time;
-        comboStep++;
+    // 마우스 위치 기준으로 대시 시도
+    void TryDashTowardMouse()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
 
-        if (comboStep == 1)
+        // 마우스 위치로 레이캐스트하여 바닥 클릭 여부 확인
+        if (Physics.Raycast(ray, out hit, 100f, dashLayerMask))
         {
-            Debug.Log("1타");
-            anime.Play("Martelo 2");
+            Vector3 target = hit.point;
+            Vector3 dir = (target - transform.position).normalized;
+            Vector3 dashTarget = transform.position + dir * maxDashDistance;
+
+            float fullDistance = Vector3.Distance(transform.position, target);
+            float dashDistance = Mathf.Min(fullDistance - stopBeforeDistance, maxDashDistance);
+
+            if (dashDistance <= 0.2f) return; // 너무 가까우면 무시
+
+            // 애니메이션 상태 변경 및 속도 증가
+            if (anime != null)
+            {
+                anime.SetBool("isDashing", true);
+                anime.speed = 3.5f;  // 대시 중 애니메이션 속도 증가
+            }
+
+            // 실제 대시 이동 시작
+            StartCoroutine(DashRoutine(dashTarget));
         }
-        // else if (comboStep == 2)
-        // {
-        //     Debug.Log("2타");
-        //     anime.Play("Boxing");
-        // }
-        // else if (comboStep == 3)
-        // {
-        //     Debug.Log("3타");
-        //     anime.Play("Martelo 2");
-        //     comboStep = 0; // 마지막 콤보까지 끝나면 초기화
-        // }
-
-        canReceiveInput = false;
     }
-
-    // 애니메이션 이벤트에서 호출
-    public void EnableComboInput()
+    // 대시 코루틴 실행
+    IEnumerator DashRoutine(Vector3 targetPosition)
     {
-        canReceiveInput = true;
-    }
+        isDashing = true;
 
-    void ResetCombo()
-    {
-        comboStep = 0;
-        canReceiveInput = true;
+        if (anime != null)
+        {
+            anime.SetBool("isDashing", true);  // 대시 상태 true
+        }
+
+        float elapsed = 0f;
+        float duration = Vector3.Distance(transform.position, targetPosition) / dashSpeed;
+        Vector3 start = transform.position;
+
+        // 부드럽게 목표 지점까지 이동
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            Vector3 newPos = Vector3.Lerp(start, targetPosition, elapsed / duration);
+            rb.MovePosition(newPos);  // 물리 이동
+            yield return null;
+        }
+
+        rb.MovePosition(targetPosition); // 마지막 위치 보정
+
+        // 대시 종료 처리
+        isDashing = false;
+        if (anime != null)
+        {
+            anime.SetBool("isDashing", false); // 대시 종료
+            anime.speed = 1f;                  // 애니메이션 속도 원복
+        }
     }
 }
