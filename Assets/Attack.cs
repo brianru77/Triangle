@@ -8,7 +8,7 @@ public class Attack : MonoBehaviour
     private Animator anime;
 
     [Header("Dash Settings")]
-    [SerializeField] private float dashSpeed = 40f;           // 대시 속도
+    [SerializeField] private float dashSpeed = 60f;           // 대시 속도
     [SerializeField] private float maxDashDistance = 10f;      // 최대 대시 거리
     [SerializeField] private float stopBeforeDistance = 0.3f; // 목표 지점에서 멈출 거리
     [SerializeField] private LayerMask dashLayerMask;         // 바닥 레이어 (대시 타겟 지정용)
@@ -73,7 +73,7 @@ public class Attack : MonoBehaviour
             if (anime != null)
             {
                 anime.SetBool("isDashing", true);
-                anime.speed = 3.5f;  // 대시 중 애니메이션 속도 증가
+                anime.speed = 4f;  // 대시 중 애니메이션 속도 증가
             }
 
             // 실제 대시 이동 시작

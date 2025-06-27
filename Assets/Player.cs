@@ -16,13 +16,23 @@ public class Player : MonoBehaviour
     private Rigidbody rb;
     private bool Flying;
     public bool isMoving;
+    [SerializeField] private Transform respawnTransform;
 
-    void OnCollisionEnter(Collision collision)
+    void OnCollisionEnter(Collision collision) //충돌_Trigger가 체크 꺼짐
     {
         if (collision.gameObject.CompareTag("Ground"))
         {
             Flying = false;
             anime.enabled = true; // 땅에 닿으면 애니메이션 다시 활성화
+        }
+    }
+    void OnTriggerEnter(Collider other) //통과_Trigger가 체크 켜짐
+    {
+        if (other.CompareTag("RespawnZone"))
+        {
+            transform.position = respawnTransform.position;
+            rb.velocity = Vector3.zero; // 속도 초기화
+            Debug.Log("리스폰!");
         }
     }
 
