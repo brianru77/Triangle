@@ -16,6 +16,7 @@ public class Player : MonoBehaviour
     private Rigidbody rb;
     private bool Flying;
     public bool isMoving;
+    private Attack get_attackScript; //공격 중 멈추기
     [SerializeField] private Transform respawnTransform;
 
     void OnCollisionEnter(Collision collision) //충돌_Trigger가 체크 꺼짐
@@ -43,15 +44,22 @@ public class Player : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         anime.applyRootMotion = false;
+        get_attackScript = GetComponent<Attack>();
     }
 
     void Update()
     {
         LookAround();
+
     }
 
     void FixedUpdate()
     {
+        if (get_attackScript != null && get_attackScript.isAttacking)
+        {
+            rb.velocity = Vector3.zero;
+            return; // 공격 중이면 이동 차단
+        }
         Move();
         Fly();
     }
@@ -90,7 +98,10 @@ public class Player : MonoBehaviour
 
         float currentSpeed = moveSpeed;
         bool isRunning = isMoving && Input.GetKey(KeyCode.LeftShift);
-
+        if (moveInput.magnitude > 0.1)
+        {
+            anime.speed = 1.4f;
+        }
         // 달리기 시 속도 증가
         if (isRunning)
             currentSpeed = 20f;

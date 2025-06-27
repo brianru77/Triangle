@@ -12,7 +12,7 @@ public class Jump : MonoBehaviour
     public bool Triple_Jump;
     public float YVelocity;
     //중력 강화_낙하 속도 빠르게
-    [SerializeField] private float fallMultiplier = 1.5f;
+    [SerializeField] private float fallMultiplier = 1.15f; //인게임에서 리셋해줘야함
 
     void FixedUpdate()
     {

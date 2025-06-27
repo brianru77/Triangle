@@ -1180,6 +1180,7 @@ MonoBehaviour:
   Double_Jump: 0
   Triple_Jump: 0
   YVelocity: 0
+  fallMultiplier: 1.15
 --- !u!1 &738849956
 GameObject:
   m_ObjectHideFlags: 0
