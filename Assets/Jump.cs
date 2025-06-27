@@ -11,7 +11,16 @@ public class Jump : MonoBehaviour
     public bool Double_Jump;
     public bool Triple_Jump;
     public float YVelocity;
+    //중력 강화_낙하 속도 빠르게
+    [SerializeField] private float fallMultiplier = 1.5f;
 
+    void FixedUpdate()
+    {
+        if (rb.velocity.y < 0)
+        {
+            rb.AddForce(Physics.gravity * fallMultiplier, ForceMode.Acceleration); //기본1배+1.5 = 2.5배
+        }
+    }
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -76,7 +85,7 @@ public class Jump : MonoBehaviour
             currentJumpCount = 0;
             anime.SetInteger("Jump", 0); // 초기화
             Debug.Log("땅에 닿음");
-            // 점프 상태 초기화
+            //점프 상태 초기화
             Double_Jump = false;
             Triple_Jump = false;
 
