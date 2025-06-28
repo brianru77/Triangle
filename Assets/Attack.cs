@@ -8,16 +8,16 @@ public class Attack : MonoBehaviour
     private Animator anime;
 
     [Header("Dash Settings")]
-    [SerializeField] private float dashSpeed = 60f;           // 대시 속도
-    [SerializeField] private float maxDashDistance = 10f;     // 최대 대시 거리
-    [SerializeField] private float stopBeforeDistance = 0.3f; // 목표 지점에서 멈출 거리
-    [SerializeField] private LayerMask dashLayerMask;         // 바닥 레이어
+    [SerializeField] private float dashSpeed = 60f;           //대시 속도
+    [SerializeField] private float maxDashDistance = 10f;     //최대 대시 거리
+    [SerializeField] private float stopBeforeDistance = 0.3f; //목표 지점에서 멈출 거리
+    [SerializeField] private LayerMask dashLayerMask;         //바닥 레이어
 
     [Header("Attack Settings")]
-    [SerializeField] private float attackDuration = 0.8f;     // 공격 지속 시간
+    [SerializeField] private float attackDuration = 0.8f;     //공격 지속 시간
 
-    private bool isDashing = false;     // 대시 중 여부
-    public bool isAttacking = false;   // 공격 중 여부
+    private bool isDashing = false;     //대시 중 여부
+    public bool isAttacking = false;   //공격 중 여부
 
     void Start()
     {

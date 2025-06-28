@@ -39,8 +39,8 @@ public class Jump : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space) && currentJumpCount == 0)
         {
-            currentJumpCount = 1; // 먼저 바꾸고
-            anime.SetInteger("Jump", currentJumpCount); // 그리고 Animator에 알려줌
+            currentJumpCount = 1; //먼저 바꾸고
+            anime.SetInteger("Jump", currentJumpCount); //그리고 Animator에 알려줌
             //rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
             rb.AddForce(Vector3.up * jumpForce, ForceMode.VelocityChange);
             Debug.Log("1단 점프");
@@ -55,7 +55,7 @@ public class Jump : MonoBehaviour
             currentJumpCount = 2;
             anime.SetInteger("Jump", currentJumpCount);
             rb.AddForce(Vector3.up * doubleJumpForce, ForceMode.VelocityChange);
-            Double_Jump = false; // 안전하게 꺼줌
+            Double_Jump = false; //안전하게 꺼줌
             Debug.Log("2단 점프");
             rb.AddForce(transform.forward * 5f, ForceMode.VelocityChange);
             rb.AddForce(Vector3.down * 3f, ForceMode.VelocityChange);
@@ -83,16 +83,16 @@ public class Jump : MonoBehaviour
         if (collision.gameObject.CompareTag("Ground"))
         {
             currentJumpCount = 0;
-            anime.SetInteger("Jump", 0); // 초기화
+            anime.SetInteger("Jump", 0); //초기화
             Debug.Log("땅에 닿음");
             //점프 상태 초기화
             Double_Jump = false;
             Triple_Jump = false;
 
-            Vector3 flatVelocity = new Vector3(rb.velocity.x, 0, rb.velocity.z); // 리지드바디 잔상 제거
+            Vector3 flatVelocity = new Vector3(rb.velocity.x, 0, rb.velocity.z); //리지드바디 잔상 제거
             if (flatVelocity.magnitude > 0.1f)
             {
-                rb.velocity = new Vector3(0, rb.velocity.y, 0); // XZ 이동속도 제거
+                rb.velocity = new Vector3(0, rb.velocity.y, 0); //XZ 이동속도 제거
             }
         }
     }
