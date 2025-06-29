@@ -7,11 +7,12 @@ TagManager:
   - Ground
   - RespawnZone
   - Mos
+  - FxTemporaire
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Enemy
   - Water
   - UI
   - 
