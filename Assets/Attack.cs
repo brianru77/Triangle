@@ -70,7 +70,6 @@ public class Attack : MonoBehaviour
             if (anime != null)
             {
                 anime.SetBool("isDashing", true);
-                anime.speed = 4f;  //대시 애니메이션 빠르게
             }
 
             StartCoroutine(DashRoutine(dashTarget));
