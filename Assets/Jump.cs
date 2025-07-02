@@ -42,7 +42,7 @@ public class Jump : MonoBehaviour
     void Jump_CreateShockwave()
     {
         Instantiate(Jump_shockwave_effects, transform.position, Quaternion.identity);
-        Destroy(Jump_shockwave_effects, 2f); // 2초 후 자동 삭제
+        Destroy(Jump_shockwave_effects, 2f); //2초 후 자동 삭제
         Debug.Log("착지 충격파 발생!");
     }
     public void HandleJump()

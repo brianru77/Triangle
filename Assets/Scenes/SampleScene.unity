@@ -1211,6 +1211,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b7c035cdee4609f4689888a8474b63b7, type: 3}
       insertIndex: -1
       addedObject: {fileID: 737655892}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b7c035cdee4609f4689888a8474b63b7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 737655894}
     - targetCorrespondingSourceObject: {fileID: 8758243483808879120, guid: b7c035cdee4609f4689888a8474b63b7, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1854512788}
@@ -1365,6 +1368,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weaponSocket: {fileID: 705570205}
   weaponPrefab: {fileID: 5436868260460024349, guid: 7e63047e14b39bc49b4d8a5a7d39e467, type: 3}
+--- !u!114 &737655894
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 737655881}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9897bdafb8028444cb8cca55ce10568f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  transform_level: 0
+  Transform_Effect1: {fileID: 100004, guid: 55700a754af55ac429f02417b245ae86, type: 3}
+  Transform_Effect12: {fileID: 100000, guid: 8f4c8e6e19f6811488df5bbe56510f9d, type: 3}
+  Transform_final_level_Effect: {fileID: 100002, guid: 4bf22a1d8d9e7724b9af67921436851d, type: 3}
 --- !u!1 &738849956
 GameObject:
   m_ObjectHideFlags: 0
