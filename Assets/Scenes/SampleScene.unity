@@ -1246,9 +1246,7 @@ MonoBehaviour:
   attackDuration: 0.8
   isAttacking: 0
   isSlashing: 0
-  Snap_Effects: {fileID: 0}
-  impactSpeed: 30
-  firePoint: {fileID: 0}
+  Illusion_Sword_Dance: 0
   attackCooldown: 1
 --- !u!136 &737655884
 CapsuleCollider:
@@ -1349,6 +1347,9 @@ MonoBehaviour:
   Double_Jump: 0
   Triple_Jump: 0
   YVelocity: 0
+  Jump_shockwave_effects: {fileID: 100004, guid: 084c6a87873fd6e4da7978a01aa18b34, type: 3}
+  Jump_shockwave_Radius: 5
+  Jump_shockwave_Damage: 30
   fallMultiplier: 1.15
 --- !u!114 &737655892
 MonoBehaviour:

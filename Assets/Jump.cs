@@ -11,6 +11,10 @@ public class Jump : MonoBehaviour
     public bool Double_Jump;
     public bool Triple_Jump;
     public float YVelocity;
+    public GameObject Jump_shockwave_effects; //충격파 이펙트
+    public float Jump_shockwave_Radius = 50f; //충격파 범위
+    public int Jump_shockwave_Damage = 30;   //충격파 데미지
+    private bool is_Jump_shockwave = false;
     //중력 강화_낙하 속도 빠르게
     [SerializeField] private float fallMultiplier = 1.15f; //인게임에서 리셋해줘야함
 
@@ -34,6 +38,12 @@ public class Jump : MonoBehaviour
         YVelocity = rb.velocity.y;
         anime.SetFloat("YVelocity", rb.velocity.y); //프레임 낙하상태 감지
         anime.SetInteger("JumpStage", currentJumpCount); //점프 카운트를 애니메이터 변수인 JumpStage로 전달
+    }
+    void Jump_CreateShockwave()
+    {
+        Instantiate(Jump_shockwave_effects, transform.position, Quaternion.identity);
+        Destroy(Jump_shockwave_effects, 2f); // 2초 후 자동 삭제
+        Debug.Log("착지 충격파 발생!");
     }
     public void HandleJump()
     {
@@ -75,6 +85,7 @@ public class Jump : MonoBehaviour
             rb.AddForce(Vector3.down * 20, ForceMode.VelocityChange);
             //rb.AddForce(transform.forward * 25f, ForceMode.VelocityChange);
             anime.speed = 1.2f;
+            is_Jump_shockwave = true;
         }
     }
 
@@ -88,6 +99,12 @@ public class Jump : MonoBehaviour
             //점프 상태 초기화
             Double_Jump = false;
             Triple_Jump = false;
+
+            if (is_Jump_shockwave)
+            {
+                Invoke("Jump_CreateShockwave", 0.2f); // 충격파 발생
+                is_Jump_shockwave = false; //발생 후 초기화
+            }
 
             Vector3 flatVelocity = new Vector3(rb.velocity.x, 0, rb.velocity.z); //리지드바디 잔상 제거
             if (flatVelocity.magnitude > 0.1f)

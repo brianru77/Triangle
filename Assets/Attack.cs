@@ -6,12 +6,12 @@ using UnityEngine;
 
 public class Attack : MonoBehaviour
 {
-    private Rigidbody rb; 
-    private Animator anime;    
+    private Rigidbody rb;
+    private Animator anime;
 
     [Header("Dash Settings")] //대시설정
-    private float dashSpeed = 60f; 
-    private float maxDashDistance = 12f;  
+    private float dashSpeed = 60f;
+    private float maxDashDistance = 12f;
     private float punchDistance = 0.1f;        //대시 후 펀치 거리
     private float targetSearchRadius = 10f;    //대시 타겟 범위
     [SerializeField] private LayerMask dashTargetMask; //대시 타겟 레이어
@@ -22,6 +22,7 @@ public class Attack : MonoBehaviour
     private bool isDashing = false;    //대시 중인지
     public bool isAttacking = false;   //공격 중인지
     public int isSlashing = 0;         //현재 슬래시 어택 단계
+    public bool Illusion_Sword_Dance = false;
 
     private GameObject dashTargetObject = null; //대시 타겟이 있을 경우 저장
     private bool canAttack = true;              //공격 가능 여부
@@ -29,8 +30,8 @@ public class Attack : MonoBehaviour
 
     void Start()
     {
-        rb = GetComponent<Rigidbody>();   
-        anime = GetComponent<Animator>();  
+        rb = GetComponent<Rigidbody>();
+        anime = GetComponent<Animator>();
     }
     void Update()
     {
@@ -45,10 +46,10 @@ public class Attack : MonoBehaviour
         }
 
         // F키 공격
-        if (Input.GetKeyDown(KeyCode.F) && canAttack && isSlashing == 0)
+        if (Input.GetKey(KeyCode.F) && canAttack && isSlashing == 0)
         {
             isSlashing = 1;
-            StartCoroutine(AttackRoutine());
+            StartCoroutine(Illusion_Sword());
             StartCoroutine(AttackCool_Time());
         }
 
@@ -57,8 +58,27 @@ public class Attack : MonoBehaviour
         {
             TryDash(); //자동 타겟
         }
-    }
 
+        if (Illusion_Sword_Dance)
+        {
+            anime.speed = 3f;
+        }
+        else
+            anime.speed = 1f;
+    }
+    IEnumerator Illusion_Sword()
+    {
+        anime.speed = 3f;
+        Illusion_Sword_Dance = true;
+        anime.SetBool("Illusion_Sword_Dance", true); //애니메이션 파라미터 설정
+        yield return new WaitForSeconds(attackDuration); //애니메이션 재생 대기
+
+        isSlashing = 0;
+        anime.SetBool("Illusion_Sword_Dance", false);
+        Illusion_Sword_Dance = false;
+        anime.speed = 1f;
+
+    }
     //공격 동작을 처리하는 코루틴
     IEnumerator AttackRoutine()
     {
