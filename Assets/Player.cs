@@ -8,7 +8,7 @@ public class Player : MonoBehaviour
     [SerializeField] private Transform PlayerBody;  //캐릭터 외형
     [SerializeField] private Transform CameraDT;    //카메라 회전 기준점
     [SerializeField] private float mouseSensitivity = 3f;
-    [SerializeField] private float moveSpeed = 5f;
+    public float moveSpeed = 10f;
 
     private float xRotation = 0f;
     private float yRotation = 0f;
@@ -45,12 +45,12 @@ public class Player : MonoBehaviour
         Cursor.visible = false;
         anime.applyRootMotion = false;
         get_attackScript = GetComponent<Attack>();
+        transform.rotation = Quaternion.identity; //유니티 좌표로 회전값 강제 정렬
     }
 
     void Update()
     {
         LookAround();
-
     }
 
     void FixedUpdate()
@@ -104,7 +104,7 @@ public class Player : MonoBehaviour
         }
         //달리기 시 속도 증가
         if (isRunning)
-            currentSpeed = 20f;
+            currentSpeed = 25f;
 
         //이동 방향 보정
         float moveX = moveInput.x;

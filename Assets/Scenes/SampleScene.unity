@@ -518,7 +518,6 @@ GameObject:
   m_Component:
   - component: {fileID: 258172116}
   - component: {fileID: 258172115}
-  - component: {fileID: 258172114}
   - component: {fileID: 258172117}
   m_Layer: 0
   m_Name: mini Cam
@@ -527,14 +526,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!81 &258172114
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 258172113}
-  m_Enabled: 1
 --- !u!20 &258172115
 Camera:
   m_ObjectHideFlags: 0
@@ -1254,10 +1245,11 @@ MonoBehaviour:
     m_Bits: 9
   attackDuration: 0.8
   isAttacking: 0
-  isSnaping: 0
-  Snap_Effects: {fileID: 2415314246714613098, guid: 8c64851aba8c3ef4a9e6a67a2e32250b, type: 3}
+  isSlashing: 0
+  Snap_Effects: {fileID: 0}
   impactSpeed: 30
-  firePoint: {fileID: 705570205}
+  firePoint: {fileID: 0}
+  attackCooldown: 1
 --- !u!136 &737655884
 CapsuleCollider:
   m_ObjectHideFlags: 0

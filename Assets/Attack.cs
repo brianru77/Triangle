@@ -6,161 +6,96 @@ using UnityEngine;
 
 public class Attack : MonoBehaviour
 {
-    private Rigidbody rb;
-    private Animator anime;
+    private Rigidbody rb; 
+    private Animator anime;    
 
-    [Header("Dash Settings")]
-    private float dashSpeed = 60f;
-    private float maxDashDistance = 12f;
-    private float punchDistance = 0.1f;
-    private float targetSearchRadius = 10f;
-    [SerializeField] private LayerMask dashTargetMask;
+    [Header("Dash Settings")] //대시설정
+    private float dashSpeed = 60f; 
+    private float maxDashDistance = 12f;  
+    private float punchDistance = 0.1f;        //대시 후 펀치 거리
+    private float targetSearchRadius = 10f;    //대시 타겟 범위
+    [SerializeField] private LayerMask dashTargetMask; //대시 타겟 레이어
 
-    [Header("Attack Settings")]
-    [SerializeField] private float attackDuration = 0.8f;
+    [Header("Attack Settings")] //공격설정
+    [SerializeField] private float attackDuration = 0.8f; //공격 애니메이션 지속 시간
 
-    private bool isDashing = false;
-    public bool isAttacking = false;
-    public bool isSnaping = false;
+    private bool isDashing = false;    //대시 중인지
+    public bool isAttacking = false;   //공격 중인지
+    public int isSlashing = 0;         //현재 슬래시 어택 단계
 
-    private GameObject dashTargetObject = null;
-
-    [Header("Snap Effect Settings")]
-    public GameObject Snap_Effects;
-    public float impactSpeed = 30f;
-    public Transform firePoint;
+    private GameObject dashTargetObject = null; //대시 타겟이 있을 경우 저장
+    private bool canAttack = true;              //공격 가능 여부
+    public float attackCooldown = 1.0f;         //공격 쿨타임
 
     void Start()
     {
-        rb = GetComponent<Rigidbody>();
-        anime = GetComponent<Animator>();
+        rb = GetComponent<Rigidbody>();   
+        anime = GetComponent<Animator>();  
     }
-
     void Update()
     {
-        //DebugRaycast();
-        DebugFirePointAndRay();
-        //좌클릭+우클릭 동시 (Snap 우선)
-        if (Input.GetMouseButtonDown(2))
+        Debug.Log("현재 슬래쉬 공격 단계: " + isSlashing);
+
+        //슬래시 어택
+        if (Input.GetMouseButtonDown(0) && canAttack && isSlashing == 0)
         {
-            StartCoroutine(SnapRoutine());
-            return;
+            isSlashing = 1;
+            StartCoroutine(AttackRoutine());          //공격 애니메이션 처리
+            StartCoroutine(AttackCool_Time());  //공격 쿨타임 처리
         }
 
-        //일반 공격 (Snap 중이 아닐 때만)
-        if (Input.GetMouseButtonDown(0) && !isSnaping)
+        // F키 공격
+        if (Input.GetKeyDown(KeyCode.F) && canAttack && isSlashing == 0)
         {
+            isSlashing = 1;
             StartCoroutine(AttackRoutine());
+            StartCoroutine(AttackCool_Time());
         }
 
-        //스마트 대시 (Snap 중 또는 대시 중 아닐 때만)
-        if (Input.GetMouseButtonDown(1) && !isDashing && !isSnaping)
+        //대시
+        if (Input.GetMouseButtonDown(1) && !isDashing)
         {
-            TrySmartDash();
-        }
-    }
-    void DebugFirePointAndRay()
-    {
-        if (firePoint == null || Camera.main == null) return;
-
-        //firePoint 위치 출력
-        Debug.Log("[🔵 firePoint.position] " + firePoint.position.ToString("F4"));
-
-        //카메라 기준 레이 생성 (마우스 위치 기준)
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        Debug.DrawRay(ray.origin, ray.direction * 10f, Color.red); //씬에 빨간 선으로 시각화
-
-        //레이 정보 출력
-        Debug.Log("[🔴 Ray Direction] " + ray.direction.ToString("F4"));
-    }
-    void DebugRaycast() //레이 제대로 확인
-    {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-        if (Physics.Raycast(ray, out RaycastHit hit, 100f))
-        {
-            Debug.DrawLine(ray.origin, hit.point, Color.green, 2f);  //명확한 선 (성공)
-            Debug.Log("Ray hit: " + hit.collider.name);
-        }
-        else
-        {
-            Debug.DrawRay(ray.origin, ray.direction * 100f, Color.red, 2f); //안 맞아도 그리기
-            Debug.Log("Ray missed");
+            TryDash(); //자동 타겟
         }
     }
 
+    //공격 동작을 처리하는 코루틴
     IEnumerator AttackRoutine()
     {
         isAttacking = true;
-        anime.SetBool("isAttacking", true);
-        yield return new WaitForSeconds(attackDuration);
+        anime.SetInteger("isSlashing", isSlashing); //애니메이션 파라미터 설정
+        yield return new WaitForSeconds(attackDuration); //애니메이션 재생 대기
+
+        isSlashing = 0;                          //공격 종료
+        anime.SetInteger("isSlashing", isSlashing);
         isAttacking = false;
-        anime.SetBool("isAttacking", false);
     }
 
-    IEnumerator SnapRoutine()
+    //공격 쿨타임을 관리하는 코루틴
+    IEnumerator AttackCool_Time()
     {
-        isSnaping = true;
-        anime.SetBool("isSnaping", true);
-
-        snap(); //발사 이펙트 처리
-
-        yield return new WaitForSeconds(0.6f); //애니메이션 길이만큼 대기 (조정 가능)
-
-        isSnaping = false;
-        anime.SetBool("isSnaping", false);
+        canAttack = false;                         //쿨타임 동안 공격 금지
+        yield return new WaitForSeconds(attackCooldown);
+        canAttack = true;                          //쿨타임 종료 후 공격 가능
     }
 
-    void snap()
+    //대시 기능 (근처 적 자동 타겟팅)
+    void TryDash()
     {
-        if (Snap_Effects == null || firePoint == null) return;
-
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-        //Raycast로 충돌지점 찾기
-        Vector3 direction;
-        if (Physics.Raycast(ray, out RaycastHit hit, 100f))
-        {
-            direction = (hit.point - firePoint.position).normalized;
-            Debug.DrawLine(firePoint.position, hit.point, Color.green, 2f);
-        }
-        else
-        {
-            //충돌이 없을 때: 마우스 방향을 기반으로 먼 위치를 임의로 잡아서 쏨
-            Vector3 fallbackPoint = ray.GetPoint(100f);
-            direction = (fallbackPoint - firePoint.position).normalized;
-            Debug.DrawLine(firePoint.position, fallbackPoint, Color.yellow, 2f);
-        }
-
-        //방향이 너무 짧거나 0에 가까우면 보정
-        if (direction == Vector3.zero)
-            direction = firePoint.forward;
-
-        //이펙트 생성 및 발사
-        GameObject impact = Instantiate(Snap_Effects, firePoint.position, Quaternion.LookRotation(direction));
-        Rigidbody rb = impact.GetComponent<Rigidbody>();
-        if (rb != null)
-        {
-            rb.velocity = direction * impactSpeed;
-        }
-
-        Destroy(impact, 2f); //2초 후 자동 삭제
-    }
-
-    void TrySmartDash()
-    {
-        GameObject nearest = FindClosestTargetInRange();
+        GameObject nearest = FindClosestTargetInRange(); //주변 가장 가까운 적 탐색
         Vector3 target;
         Vector3 dir;
 
         if (nearest != null)
         {
+            //자동 타겟팅 성공 시, 타겟 근처까지 이동
             dir = (nearest.transform.position - transform.position).normalized;
             target = nearest.transform.position - dir * punchDistance;
             dashTargetObject = nearest;
         }
         else
         {
+            //타겟 없으면 마우스 클릭 위치로 대시
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
 
@@ -171,19 +106,22 @@ public class Attack : MonoBehaviour
             dashTargetObject = null;
         }
 
+        //거리 계산 및 제한
         float distance = Vector3.Distance(transform.position, target);
         float dashDistance = Mathf.Min(distance, maxDashDistance);
 
-        if (dashDistance <= 0.2f) return;
+        if (dashDistance <= 0.2f) return; //너무 가까우면 무시
 
         Vector3 dashTarget = transform.position + dir * dashDistance;
 
+        //대시 애니메이션 트리거
         if (anime != null)
             anime.SetBool("isDashing", true);
 
-        StartCoroutine(DashRoutine(dashTarget));
+        StartCoroutine(DashRoutine(dashTarget)); //대시 실행
     }
 
+    //실제 대시 이동을 처리하는 코루틴
     IEnumerator DashRoutine(Vector3 targetPosition)
     {
         isDashing = true;
@@ -196,8 +134,9 @@ public class Attack : MonoBehaviour
         {
             elapsed += Time.deltaTime;
             Vector3 newPos = Vector3.Lerp(start, targetPosition, elapsed / duration);
-            rb.MovePosition(newPos);
+            rb.MovePosition(newPos); //스근하게 이동
 
+            //타겟이 있을 경우, 근접 시 멈춤
             if (dashTargetObject != null)
             {
                 if (Vector3.Distance(newPos, dashTargetObject.transform.position) <= punchDistance)
@@ -211,17 +150,18 @@ public class Attack : MonoBehaviour
 
             yield return null;
         }
-
+        //마지막 위치 보정
         rb.MovePosition(targetPosition);
         isDashing = false;
 
+        //애니메이션 종료 처리
         if (anime != null)
         {
             anime.SetBool("isDashing", false);
             anime.speed = 1f;
         }
     }
-
+    //가장 가까운 타겟 탐색하는 함수
     GameObject FindClosestTargetInRange()
     {
         GameObject[] allTargets = GameObject.FindGameObjectsWithTag("Mos");
@@ -237,7 +177,6 @@ public class Attack : MonoBehaviour
                 minDist = dist;
             }
         }
-
         return closest;
     }
 }
